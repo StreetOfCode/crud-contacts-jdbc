@@ -54,8 +54,6 @@ public class CRUDManager {
         final int result = contactService.create(name, email, phone);
         if (result > 0) {
             System.out.println("Contact created successfully");
-        } else {
-            System.out.println("Error while creating contact");
         }
     }
 }

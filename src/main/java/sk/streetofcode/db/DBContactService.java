@@ -2,10 +2,7 @@ package sk.streetofcode.db;
 
 import org.slf4j.Logger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +44,11 @@ public class DBContactService {
             statement.setString(3, phone);
 
             return statement.executeUpdate();
+        } catch (SQLIntegrityConstraintViolationException e) {
+            System.out.println("Contact with this email or phone already exists");
+            return 0;
         } catch (SQLException e) {
+            System.out.println("aj tu");
             logger.error("Error while creating contact!", e);
             return 0;
         }
