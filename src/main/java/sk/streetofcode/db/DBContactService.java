@@ -11,6 +11,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class DBContactService {
     private static final String READ_ALL = "SELECT * FROM contact";
     private static final String CREATE = "INSERT INTO contact (name, email, phone) VALUES (?, ?, ?)";
+    private static final String DELETE = "DELETE FROM contact WHERE id = ?";
 
     private static final Logger logger = getLogger(DBContactService.class);
 
@@ -35,6 +36,19 @@ public class DBContactService {
         }
     }
 
+    public int delete(int id) {
+        try (Connection connection = HikariCPDataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(DELETE)) {
+
+            statement.setInt(1, id);
+            // returns number of affected rows
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error while deleting contact!", e);
+            return 0;
+        }
+    }
+
     public int create(String name, String email, String phone) {
         try (Connection connection = HikariCPDataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(CREATE, PreparedStatement.RETURN_GENERATED_KEYS)) {
@@ -48,7 +62,6 @@ public class DBContactService {
             System.out.println("Contact with this email or phone already exists");
             return 0;
         } catch (SQLException e) {
-            System.out.println("aj tu");
             logger.error("Error while creating contact!", e);
             return 0;
         }
