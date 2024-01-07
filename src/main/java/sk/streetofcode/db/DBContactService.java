@@ -14,6 +14,8 @@ public class DBContactService {
     private static final String DELETE = "DELETE FROM contact WHERE id = ?";
     private static final String EDIT = "UPDATE contact SET name = ?, email = ?, phone = ? WHERE id = ?";
 
+    private static final String SEARCH_BY_EMAIL = "SELECT * FROM contact WHERE email LIKE ?";
+
     private static final Logger logger = getLogger(DBContactService.class);
 
     public List<Contact> readAll() {
@@ -84,6 +86,28 @@ public class DBContactService {
         } catch (SQLException e) {
             logger.error("Error while creating contact!", e);
             return 0;
+        }
+    }
+
+    public List<Contact> searchByEmail(String email) {
+        try (Connection connection = HikariCPDataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SEARCH_BY_EMAIL)) {
+
+            statement.setString(1, "%" + email + "%");
+            ResultSet resultSet = statement.executeQuery();
+            List<Contact> contacts = new ArrayList<>();
+            while (resultSet.next()) {
+                contacts.add(new Contact(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email"),
+                        resultSet.getString("phone")
+                ));
+            }
+            return contacts;
+        } catch (SQLException e) {
+            logger.error("Error while searching by email!", e);
+            return null;
         }
     }
 }
